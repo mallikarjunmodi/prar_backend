@@ -34,6 +34,7 @@ export default function (httpServer) {
     socket.on("start_bp", () => {
       bpSensor.onSensor((sensorData) => {
         socket.emit("bp_data", { data: sensorData });
+
       });
     });
 

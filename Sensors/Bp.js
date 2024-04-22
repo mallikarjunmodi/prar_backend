@@ -12,22 +12,23 @@ const bpOn = ["0X55", "0XAA", "0X04", "0X02", "0X01", "0XF8"];
 const bpoff = ["0x55", "0xAA", " 0x04", "0x02", "0x00", "0xF9"];
 
 class BpSensor {
-  constructor() {
-    this.port = null;
-  }
+  // constructor() {
+  //   this.port = null;
+  // }
 
   async onSensor(callback) {
     const ports = await SerialPort.list();
-    const sensorPortInfo = ports.find(
-      (port) => port.vendorId === `1A86` && port.productId === `7523`
-    );
+    // const sensorPortInfo = ports.find(
+    //   (port) => port.vendorId === `1A86` && port.productId === `7523`
+    // );
 
-    if (!sensorPortInfo) {
-      console.error("Bp Sensor not found.");
-      return null;
-    }
+    // if (!sensorPortInfo) {
+    //   console.error("Bp Sensor not found.");
+    //   return null;
+    // }
 
-    this.port = new SerialPort({ path: sensorPortInfo.path, baudRate: 115200 });
+this.port = null;
+    this.port = new SerialPort({ path: '/dev/ttyUSB0', baudRate: 115200 });
     console.log("Connected to Serial Port . Baud Rate : 115200");
     this.port.write(spoff);
     this.port.write(ecgwaveoff);

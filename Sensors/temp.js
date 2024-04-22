@@ -1,4 +1,6 @@
 import { SerialPort } from "serialport";
+import { ReadlineParser } from '@serialport/parser-readline';
+
 
 const ecgoff = ["0x55", "0xAA", "0x04", "0x01", "0x00", "0xFA"];
 const spoff = ["0x55", "0xAA", "0x04", "0x03", "0x00", "0xF8"];
@@ -14,24 +16,26 @@ class TempSensor {
     this.port = null;
   }
 
+
   async onSensor(callback) {
     const ports = await SerialPort.list();
-    const sensorPortInfo = ports.find(
-      (port) => port.vendorId === `1A86` && port.productId === `7523`
-    );
+ 
 
-    if (!sensorPortInfo) {
-      console.error("Hr Sensor not found.");
-      return null;
-    }
-
-    this.port = new SerialPort({ path: sensorPortInfo.path, baudRate: 9600 });
+    this.port = new SerialPort({ path:'/dev/ttyUSB0', baudRate: 9600 });
     console.log("Connected to Serial Port . Baud Rate : 9600");
-    this.port.on("data", async function (data) {
-      console.log("data", data);
+    const parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
+
+    parser.on('data', (data) => {
+      console.log('Received:', data);
       callback(data);
     });
+    
+
+    this.port.on("data",  (data)  => {
+      console.log("data", data);
+    });
   }
+
 
   offSensor() {
     if (this.port) {

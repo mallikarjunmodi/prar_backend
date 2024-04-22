@@ -1,23 +1,22 @@
 import { SerialPort } from "serialport";
+import { ReadlineParser } from '@serialport/parser-readline';
+
+
 class BgSensor {
-  constructor() {
-    this.port = null;
-  }
+  // constructor() {
+  //   this.port = null;
+  // }
 
   async onSensor(callback) {
     const ports = await SerialPort.list();
-    const sensorPortInfo = ports.find(
-      (port) => port.vendorId === `1A86` && port.productId === `7523`
-    );
+    this.port = null;
 
-    if (!sensorPortInfo) {
-      console.error("Bg Sensor not found.");
-      return null;
-    }
 
-    this.port = new SerialPort({ path: sensorPortInfo.path, baudRate: 9600});
+    this.port = new SerialPort({ path:'/dev/ttyUSB0', baudRate: 9600});
+    const parser = this.port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+
     console.log("Connected to Serial Port . Baud Rate : 9600");
-    this.port.on("data", async function (data) {
+    this.port.on("data", (data) =>{
       console.log("data", data);
       callback(data);
     });

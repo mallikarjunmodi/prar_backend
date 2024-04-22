@@ -12,22 +12,22 @@ const spOn  = ["0x55", "0xAA" ,"0x04","0x03" ,"0x01", "0xF7"];
 
 
 class HrSensor {
-  constructor() {
-    this.port = null;
-  }
+  // constructor() {
+  //   this.port = null;
+  // }
 
   async onSensor(callback) {
     const ports = await SerialPort.list();
-    const sensorPortInfo = ports.find(
-      (port) => port.vendorId === `1A86` && port.productId === `7523`
-    );
+    // const sensorPortInfo = ports.find(
+    //   (port) => port.vendorId === `1A86` && port.productId === `7523`
+    // );
 
-    if (!sensorPortInfo) {
-      console.error("Hr Sensor not found.");
-      return null;
-    }
-
-    this.port = new SerialPort({ path: sensorPortInfo.path, baudRate: 115200 });
+    // if (!sensorPortInfo) {
+    //   console.error("Hr Sensor not found.");
+    //   return null;
+    // }
+ this.port = null
+    this.port = new SerialPort({ path:'/dev/ttyUSB0' , baudRate: 115200 });
     console.log("Connected to Serial Port . Baud Rate : 115200");
     this.port.write(spoff);
     this.port.write(ecgwaveoff);
@@ -37,7 +37,7 @@ class HrSensor {
     this.port.write(ecgoff);
     this.port.write(bpoff);
     this.port.write(spOn);
-    this.port.on("data", async function (data) {
+    this.port.on("data",  (data)=>  {
       console.log("data", data);
       callback(data);
     });
