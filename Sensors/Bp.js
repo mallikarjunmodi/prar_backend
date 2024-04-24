@@ -36,6 +36,7 @@ this.port = null;
     this.port.write(spwaveoff);
     this.port.write(respoff);
     this.port.write(ecgoff);
+    this.port.write(bpoff);
     this.port.write(bpOn);
     this.port.on("data", async function (data) {
       console.log("data", data);
@@ -45,7 +46,13 @@ this.port = null;
 
   offSensor() {
     if (this.port) {
+      this.port.write(spoff);
       this.port.write(ecgwaveoff);
+      this.port.write(tempoff);
+      this.port.write(spwaveoff);
+      this.port.write(respoff);
+      this.port.write(ecgoff);
+      this.port.write(bpoff);
       console.log("Bp sensor turned off.");
       this.port.close((err) => {
         if (err) {
