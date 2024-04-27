@@ -8,11 +8,13 @@ class BgSensor {
   // }
 
   async onSensor(callback) {
-    const ports = await SerialPort.list();
-    this.port = null;
+    // const ports = await SerialPort.list();
+    if (this.port && this.port.isOpen) {
+      this.port.close();
+  }
+  this.port = null
 
-
-    this.port = new SerialPort({ path:'/dev/ttyUSB0', baudRate: 9600});
+    this.port = new SerialPort({ path:'/dev/ttyUSB2', baudRate: 9600});
     const parser = this.port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
     console.log("Connected to Serial Port . Baud Rate : 9600");

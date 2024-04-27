@@ -17,7 +17,11 @@ class HrSensor {
   // }
 
   async onSensor(callback) {
-    const ports = await SerialPort.list();
+    if (this.port && this.port.isOpen) {
+      this.port.close();
+  }
+    ``
+    // const ports = await SerialPort.list();
     // const sensorPortInfo = ports.find(
     //   (port) => port.vendorId === `1A86` && port.productId === `7523`
     // );
@@ -29,6 +33,13 @@ class HrSensor {
  this.port = null
     this.port = new SerialPort({ path:'/dev/ttyUSB0' , baudRate: 115200 });
     console.log("Connected to Serial Port . Baud Rate : 115200");
+    this.port.write(spoff);
+    this.port.write(ecgwaveoff);
+    this.port.write(tempoff);
+    this.port.write(spwaveoff);
+    this.port.write(respoff);
+    this.port.write(ecgoff);
+    this.port.write(bpoff);
     this.port.write(spoff);
     this.port.write(ecgwaveoff);
     this.port.write(tempoff);

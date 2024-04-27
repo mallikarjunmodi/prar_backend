@@ -18,21 +18,25 @@ class TempSensor {
 
 
   async onSensor(callback) {
-    const ports = await SerialPort.list();
+    // const ports = await SerialPort.list();
+    if (this.port && this.port.isOpen) {
+      this.port.close();
+  }
+  this.port = null
  
 
-    this.port = new SerialPort({ path:'/dev/ttyUSB0', baudRate: 9600 });
+    this.port = new SerialPort({ path:'/dev/ttyUSB1', baudRate: 9600 });
     console.log("Connected to Serial Port . Baud Rate : 9600");
     const parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
 
     parser.on('data', (data) => {
       console.log('Received:', data);
-      callback(data);
     });
     
 
     this.port.on("data",  (data)  => {
       console.log("data", data);
+      callback(data);
     });
   }
 
