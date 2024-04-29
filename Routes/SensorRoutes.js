@@ -12,11 +12,18 @@ export default function (httpServer) {
       methods: ["GET", "POST"],
     },
   });
+  
 
   io.on("connection", (socket) => {
+
+  // let messageSent = false;
+  
+  //   if (!messageSent) {
+  //     socket.emit("server_s", { message: 'Server is up and running!' });
+  //     messageSent = true;  // Set the flag to true so it won't send again
+  //   }
     //ecg
     socket.on("send_message_ecg", (data) => {
-      console.log(data.message);
 
       if (data.message === "Start") {
 
