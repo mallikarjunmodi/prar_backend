@@ -17,7 +17,15 @@ export default function (httpServer) {
     //ecg
     socket.on("send_message_ecg", (data) => {
       console.log(data.message);
+
       if (data.message === "Start") {
+
+        hrSensor.offSensor();
+        bgSensor.offSensor();
+        ecgSensor.offSensor();
+        tempSensor.offSensor();
+        bpSensor.offSensor();
+  
         ecgSensor.onSensor((sensorData) => {
           socket.emit("ecg_data", { data: sensorData });
         });
@@ -32,6 +40,14 @@ export default function (httpServer) {
 
     //bp
     socket.on("start_bp", () => {
+
+      hrSensor.offSensor();
+      bgSensor.offSensor();
+      ecgSensor.offSensor();
+      tempSensor.offSensor();
+      bpSensor.offSensor();
+
+
       bpSensor.onSensor((sensorData) => {
         socket.emit("bp_data", { data: sensorData });
 
@@ -39,6 +55,7 @@ export default function (httpServer) {
     });
 
     socket.on("stop_bp", () => {
+      
       bpSensor.offSensor(() => {
         socket.emit("bp_data", { data: "Sensor stopped" });
       });
@@ -47,6 +64,14 @@ export default function (httpServer) {
 
     //hr
     socket.on("start_hr", () => {
+
+      hrSensor.offSensor();
+      bgSensor.offSensor();
+      ecgSensor.offSensor();
+      tempSensor.offSensor();
+      bpSensor.offSensor();
+
+
       hrSensor.onSensor((sensorData) => {
         socket.emit("hr_data", { data: sensorData });
       });
@@ -61,6 +86,14 @@ export default function (httpServer) {
 
     //temp
     socket.on("start_temp", () => {
+
+
+      hrSensor.offSensor();
+      bgSensor.offSensor();
+      ecgSensor.offSensor();
+      tempSensor.offSensor();
+      bpSensor.offSensor();
+
       tempSensor.onSensor((sensorData) => {
         socket.emit("temp_data", { data: sensorData });
       });
@@ -75,6 +108,13 @@ export default function (httpServer) {
 
     //bg
     socket.on("start_bg", () => {
+
+      hrSensor.offSensor();
+      bgSensor.offSensor();
+      ecgSensor.offSensor();
+      tempSensor.offSensor();
+      bpSensor.offSensor();
+
       bgSensor.onSensor((sensorData) => {
         socket.emit("bg_data", { data: sensorData });
       });

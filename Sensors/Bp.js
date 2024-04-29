@@ -26,10 +26,11 @@ class BpSensor {
     //   console.error("Bp Sensor not found.");
     //   return null;
     // }
+
     if (this.port && this.port.isOpen) {
       this.port.close();
+      this.port = null;
   }
-this.port = null;
     this.port = new SerialPort({ path: '/dev/ttyUSB0', baudRate: 115200 });
     console.log("Connected to Serial Port . Baud Rate : 115200");
     this.port.write(spoff);
@@ -45,6 +46,7 @@ this.port = null;
       callback(data);
     });
   }
+  
 
   offSensor() {
     if (this.port) {

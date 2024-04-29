@@ -41,8 +41,14 @@ class EcgSensor {
   offSensor() {
     if (this.port) {
       this.port.write(ecgwaveoff);
-      this.port.close();
-      console.log("Sensor turned off.");
+      this.port.close((err) => {
+        if (err) {
+          console.error("Failed to close the serial port", err);
+        } else {
+          console.log("Serial port closed.");
+        }
+      });
+      this.port = null;
     } else {
       console.error("Serial port not initialized or already closed.");
     }
