@@ -50,6 +50,7 @@ class BpSensor {
 
   offSensor() {
     if (this.port) {
+      this.port.write(bpoff);
       this.port.write(spoff);
       this.port.write(ecgwaveoff);
       this.port.write(tempoff);
