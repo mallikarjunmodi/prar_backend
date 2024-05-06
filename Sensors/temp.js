@@ -25,7 +25,7 @@ class TempSensor {
   this.port = null
  
 
-    this.port = new SerialPort({ path:'/dev/ttyUSB1', baudRate: 9600 });
+    this.port = new SerialPort({ path:'/dev/ttyUSB2', baudRate: 9600 });
     console.log("Connected to Serial Port . Baud Rate : 9600");
     const parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
 
