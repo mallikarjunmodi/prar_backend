@@ -21,17 +21,17 @@ class HrSensor {
       this.port.close();
   }
     ``
-    // const ports = await SerialPort.list();
-    // const sensorPortInfo = ports.find(
-    //   (port) => port.vendorId === `1A86` && port.productId === `7523`
-    // );
+    const ports = await SerialPort.list();
+    const sensorPortInfo = ports.find(
+      (port) => port.vendorId === `10c4` && port.productId === `ea60`
+    );
 
-    // if (!sensorPortInfo) {
-    //   console.error("Hr Sensor not found.");
-    //   return null;
-    // }
+    if (!sensorPortInfo) {
+      console.error("Hr Sensor not found.");
+      return null;
+    }
  this.port = null
-    this.port = new SerialPort({ path:'/dev/ttyUSB0' , baudRate: 115200 });
+    this.port = new SerialPort({ path:sensorPortInfo.path , baudRate: 115200 });
     console.log("Connected to Serial Port . Baud Rate : 115200");
     this.port.write(spoff);
     this.port.write(ecgwaveoff);
