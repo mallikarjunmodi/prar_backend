@@ -22,7 +22,7 @@ class EcgSensor {
     );
 
     if (!sensorPortInfo) {
-      console.error("Bp Sensor not found.");
+      console.error("ecg Sensor not found.");
       return null;
     }
     
@@ -40,12 +40,33 @@ class EcgSensor {
     this.port.write(respoff);
     this.port.write(ecgoff);
     this.port.write(ecgwave);
-    this.port.on("data", async function (data) {
-      console.log("data", data);
-      const readings = data[4];
-      callback(readings);
+
+    let buffer = Buffer.alloc(0);
+    let capturing = false;
+
+    this.port.on("data", async function (data)  {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] === 0x55) {
+          // Check if the buffer already has data and starts with 0x55 followed by 0xAA
+          if (capturing && buffer.length > 1 && buffer[0] === 0x55 && buffer[1] === 0xAA) {
+            console.log("Captured buffer:", buffer);
+            callback(buffer[4]);
+            buffer = Buffer.alloc(0);
+          }
+          capturing = true;
+        }
+        if (capturing) {
+          buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+        }
+      }
     });
+    // this.port.on("data", async function (data) {
+    //   console.log("data", data);
+    //   const readings = data[4];
+    //   callback(readings);
+    // });
   }
+  
 
   offSensor() {
     if (this.port) {

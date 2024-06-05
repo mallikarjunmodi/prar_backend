@@ -42,9 +42,24 @@ class BpSensor {
     this.port.write(ecgoff);
     this.port.write(bpoff);
     this.port.write(bpOn);
-    this.port.on("data", async function (data) {
-      console.log("data", data);
-      callback(data);
+    let buffer = Buffer.alloc(0);
+    let capturing = false;
+
+    this.port.on("data", async function(data)  {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] === 0x55) {
+          // Check if the buffer already has data and starts with 0x55 followed by 0xAA
+          if (capturing && buffer.length > 1 && buffer[0] === 0x55 && buffer[1] === 0xAA) {
+            console.log("Captured buffer:", buffer);
+            callback(buffer);
+            buffer = Buffer.alloc(0);
+          }
+          capturing = true;
+        }
+        if (capturing) {
+          buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+        }
+      }
     });
   }
   

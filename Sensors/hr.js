@@ -23,15 +23,17 @@ class HrSensor {
     ``
     const ports = await SerialPort.list();
     const sensorPortInfo = ports.find(
-      (port) => port.vendorId === `10c4` && port.productId === `ea60`
+    (port) => port.vendorId === `10c4` && port.productId === `ea60`
     );
 
-    if (!sensorPortInfo) {
-      console.error("Hr Sensor not found.");
+ if (!sensorPortInfo) {
+     console.error("Hr Sensor not found.");
       return null;
     }
  this.port = null
-    this.port = new SerialPort({ path:sensorPortInfo.path , baudRate: 115200 });
+    //this.port = new SerialPort({ path: '/dev/ttyUSB0'  , baudRate: 115200 });
+       this.port = new SerialPort({ path:sensorPortInfo.path , baudRate: 115200 });
+
     console.log("Connected to Serial Port . Baud Rate : 115200");
     this.port.write(spoff);
     this.port.write(ecgwaveoff);
@@ -48,10 +50,27 @@ class HrSensor {
     this.port.write(ecgoff);
     this.port.write(bpoff);
     this.port.write(spOn);
-    this.port.on("data",  (data)=>  {
-      console.log("data", data);
-      callback(data);
+   
+    let buffer = Buffer.alloc(0);
+    let capturing = false;
+
+    this.port.on("data", async function(data)  {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] === 0x55) {
+          // Check if the buffer already has data and starts with 0x55 followed by 0xAA
+          if (capturing && buffer.length > 1 && buffer[0] === 0x55 && buffer[1] === 0xAA) {
+            console.log("Captured buffer:", buffer);
+            callback(buffer);
+            buffer = Buffer.alloc(0);
+          }
+          capturing = true;
+        }
+        if (capturing) {
+          buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+        }
+      }
     });
+
   }
 
   offSensor() {
