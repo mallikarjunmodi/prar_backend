@@ -49,6 +49,12 @@ class EcgSensor {
 
   offSensor() {
     if (this.port) {
+      this.port.write(spoff);
+      this.port.write(nibpoff);
+      this.port.write(tempoff);
+      this.port.write(spwaveoff);
+      this.port.write(respoff);
+      this.port.write(ecgoff);
       this.port.write(ecgwaveoff);
       this.port.close((err) => {
         if (err) {

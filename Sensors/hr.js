@@ -19,6 +19,8 @@ class HrSensor {
   async onSensor(callback) {
     if (this.port && this.port.isOpen) {
       this.port.close();
+      this.port = null;
+
   }
     ``
     const ports = await SerialPort.list();
