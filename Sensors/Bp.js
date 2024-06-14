@@ -44,8 +44,8 @@ class BpSensor {
     this.port.write(bpOn);
     let buffer = Buffer.alloc(0);
     let capturing = false;
-
-    this.port.on("data", async function(data)  {
+    
+    this.port.on("data", async function(data) {
       for (let i = 0; i < data.length; i++) {
         if (data[i] === 0x55) {
           // Check if the buffer already has data and starts with 0x55 followed by 0xAA
@@ -57,10 +57,17 @@ class BpSensor {
           capturing = true;
         }
         if (capturing) {
-          buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+          if (buffer.length < 10) {
+            buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+          } else {
+            console.log("Buffer exceeded max length of 10 bytes. Discarding data.");
+            capturing = false;
+            buffer = Buffer.alloc(0);
+          }
         }
       }
     });
+    
   }
   
 
