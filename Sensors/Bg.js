@@ -29,9 +29,50 @@ class BgSensor {
     const parser = this.port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
     console.log("Connected to Serial Port . Baud Rate : 9600");
-    this.port.on("data", (data) =>{
-      console.log("data", data);
-      callback(data);
+    let buffer = Buffer.alloc(0);
+    let capturing = false;
+    let targetLength = 0;
+    
+    this.port.on("data", function(data) {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] === 0xF5) {
+          // Check if the buffer already has data and starts with 0xF5 followed by 0xA0
+          if (capturing && buffer.length >= 2 && buffer[0] === 0xF5 && buffer[1] === 0xA0) {
+            console.log("Captured buffer:", buffer);
+            callback(buffer);
+            buffer = Buffer.alloc(0);
+            targetLength = 0;
+          }
+          capturing = true;
+        }
+        if (capturing) {
+          buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+          
+          // Set the target length based on the third byte
+          if (buffer.length === 3) {
+            if (buffer[2] === 0x01 || buffer[2] === 0x02) {
+              targetLength = 5;
+            } else if (buffer[2] === 0x08) {
+              targetLength = 12;
+            } else {
+              // If the third byte is not 0x01, 0x02, or 0x08, reset the buffer
+              console.log("Unexpected third byte. Discarding data.");
+              capturing = false;
+              buffer = Buffer.alloc(0);
+              targetLength = 0;
+            }
+          }
+    
+          // Check if buffer has reached the target length
+          if (targetLength > 0 && buffer.length >= targetLength) {
+            console.log("Captured buffer:", buffer);
+            callback(buffer);
+            capturing = false;
+            buffer = Buffer.alloc(0);
+            targetLength = 0;
+          }
+        }
+      }
     });
   }
 
