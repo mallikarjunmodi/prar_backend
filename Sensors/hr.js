@@ -65,10 +65,21 @@ class HrSensor {
           }
           capturing = true;
         }
+        // if (capturing) {
+        //   buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+        // }
+
         if (capturing) {
-          buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+          if (buffer.length < 10) {
+            buffer = Buffer.concat([buffer, Buffer.from([data[i]])]);
+          } else {
+            console.log("Buffer exceeded max length of 10 bytes. Discarding data.");
+            capturing = false;
+            buffer = Buffer.alloc(0);
+          }
         }
       }
+      
     });
 
   }
