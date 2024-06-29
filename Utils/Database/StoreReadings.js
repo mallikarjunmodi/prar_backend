@@ -1,21 +1,30 @@
 import moment from "moment";
 import dbInstance from "../../DbInstance.js";
+import { startCheckingInternet } from "../../index.js";
+
+// const recorded_at = () => {
+//   return moment().format("MMM DD, YYYY [at] h:mm:ss A [UTC]Z")
+// }
+
+// const updated_at = () => {
+//   return moment().format("MMM DD, YYYY [at] h:mm:ss A [UTC]Z")
+// }
 
 const StoreReadings = async (userId, sensor, readings) => {
   try {
+    
     const localDb = await dbInstance.getLocalDb();
-    const timestamp = moment().format("MMM DD, YYYY [at] h:mm:ss A [UTC]Z");
 
     await localDb
       .collection(`${sensor}_last`)
       .updateOne(
         { userId },
-        { $set: { readings, timestamp } },
+        { $set: { readings,  recorded_at : new Date() } },
         { upsert: true }
       );
     await localDb
       .collection(`${sensor}_readings`)
-      .insertOne({ userId, readings, timestamp });
+      .insertOne({ userId, readings, recorded_at : new Date() });
 
     console.log("Updated Sensordata to Local MongoDB");
 
@@ -25,14 +34,15 @@ const StoreReadings = async (userId, sensor, readings) => {
         .collection(`${sensor}_last`)
         .updateOne(
           { userId },
-          { $set: { readings, timestamp } },
+          { $set: { readings , recorded_at : new Date() } },
           { upsert: true }
         );
       await cloudDb
         .collection(`${sensor}_readings`)
-        .insertOne({ userId, readings, timestamp });
+        .insertOne({ userId, readings , recorded_at : new Date() });
 
       console.log("Updated Sensordata to Cloud MongoDB");
+      startCheckingInternet();
     } catch (cloudError) {
       console.log(
         "Failed to store data to cloud DB, appending to queue: ",
@@ -40,7 +50,7 @@ const StoreReadings = async (userId, sensor, readings) => {
       );
       await localDb
         .collection("sensor_data_queue")
-        .insertOne({ userId, sensor, readings, timestamp });
+        .insertOne({ userId, sensor, readings, recorded_at : new Date() });
     }
   } catch (error) {
     console.log("An Error Occurred During storing sensordata: ", error);

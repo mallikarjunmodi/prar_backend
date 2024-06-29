@@ -1,7 +1,10 @@
 import dbInstance from "../../DbInstance.js";
+import { stopCheckingInternet} from "../../index.js";
 
-const syncData = async () => {
+export const SyncSensorData = async () => {
   try {
+
+    
     const localDb = await dbInstance.getLocalDb();
     const cloudDb = await dbInstance.getCloudDb();
 
@@ -9,16 +12,24 @@ const syncData = async () => {
       .collection("sensor_data_queue")
       .find()
       .toArray();
+
+      if (queueData.length < 1) {
+        console.log("No data to synchronize");
+        stopCheckingInternet();
+        return;
+      }
+      console.log("Local database changes detected, synchronizing...");
+
     for (const data of queueData) {
-      const { userId, sensor, readings, timestamp } = data;
+      const { userId, sensor, readings, recorded_at} = data;
       await cloudDb
         .collection(`${sensor}_readings`)
-        .insertOne({ userId, readings, timestamp });
+        .insertOne({ userId, readings, recorded_at });
       await cloudDb
         .collection(`${sensor}_last`)
         .updateOne(
           { userId },
-          { $set: { readings, timestamp } },
+          { $set: { readings,recorded_at } },
           { upsert: true }
         );
 
@@ -29,8 +40,7 @@ const syncData = async () => {
 
     console.log("Data synchronized with cloud database");
   } catch (error) {
-    console.log("An error occurred during synchronization: ", error);
+    console.log("An error occurred during synchronization: ");
   }
 };
 
-export default syncData;

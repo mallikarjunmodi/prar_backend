@@ -1,6 +1,6 @@
 import dbInstance from '../../DbInstance.js';
 
-const GetLastReadings = async () => {
+const GetLastReadings = async (res,userId) => {
   try {
     const db = await dbInstance.getLocalDb();
     const sensors = ['bp', 'bg', 't', 'hr', 'sp'];
@@ -12,9 +12,12 @@ const GetLastReadings = async () => {
       .toArray();
     }
 
-    return allReadings;
+    return res.json(allReadings)
   } catch (error) {
-    console.log('An Error Occurred when trying to retrieve last readings: ', error);
+    res.json({
+      message: "An Error Occurred when trying to retrieve last readings: ",
+      error: true,
+    });
   }
 };
 
