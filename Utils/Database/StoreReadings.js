@@ -1,6 +1,5 @@
-import moment from "moment";
 import dbInstance from "../../DbInstance.js";
-import { startCheckingInternet } from "../../index.js";
+import { StartCheckingInternet } from "../../index.js";
 
 // const recorded_at = () => {
 //   return moment().format("MMM DD, YYYY [at] h:mm:ss A [UTC]Z")
@@ -42,7 +41,6 @@ const StoreReadings = async (userId, sensor, readings) => {
         .insertOne({ userId, readings , recorded_at : new Date() });
 
       console.log("Updated Sensordata to Cloud MongoDB");
-      startCheckingInternet();
     } catch (cloudError) {
       console.log(
         "Failed to store data to cloud DB, appending to queue: ",
@@ -51,7 +49,9 @@ const StoreReadings = async (userId, sensor, readings) => {
       await localDb
         .collection("sensor_data_queue")
         .insertOne({ userId, sensor, readings, recorded_at : new Date() });
+        StartCheckingInternet()
     }
+    
   } catch (error) {
     console.log("An Error Occurred During storing sensordata: ", error);
   }

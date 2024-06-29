@@ -5,9 +5,9 @@ const GetReadings = async (res, userId, sensor = null) => {
     const db = await dbInstance.getLocalDb();
     let sensors = sensor ? [sensor] : ["bp", "bg", "t", "hr", "sp"];
     const uniqueDatesSet = new Set();
-
+    let readings = [];
     for (const sensor of sensors) {
-      const readings = await db
+      readings = await db
         .collection(`${sensor}_readings`)
         .aggregate([
           { $match: { userId: userId } },
@@ -31,7 +31,7 @@ const GetReadings = async (res, userId, sensor = null) => {
 
     const uniqueDates = Array.from(uniqueDatesSet);
 
-    return res.json(uniqueDates);
+    return res.json({readings,uniqueDates});
   } catch (error) {
     console.log(error)
     res.json({

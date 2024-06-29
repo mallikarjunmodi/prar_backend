@@ -6,7 +6,8 @@ import cors from "cors";
 import DatabaseRoutes from "./Routes/Database.js";
 import network from "network";
 import dotenv from "dotenv";
-import {SyncSensorData} from "./Utils/Database/SyncService.js";
+import { SyncSensorData } from "./Utils/Database/SyncService.js";
+import GetQueueData from "./Utils/Database/getQueueData.js";
 
 dotenv.config();
 
@@ -56,9 +57,15 @@ function checkInternetConnection() {
   });
 }
 
-export function startCheckingInternet() {
+export function StartCheckingInternet() {
   const interval = process.env.CHECK_INTERVAL || 10000;
   intervalId = setInterval(checkInternetConnection, interval);
+}
+
+export async function CheckLocalQueue() {
+  if ( await GetQueueData()) {
+    StartCheckingInternet();
+  }
 }
 
 export function stopCheckingInternet() {
@@ -70,5 +77,5 @@ export function stopCheckingInternet() {
 
 httpServer.listen(process.env.PORT || 5000, () => {
   console.log(`Server started on port ${process.env.PORT || 5000}`);
-  startCheckingInternet();
+  CheckLocalQueue();
 });
